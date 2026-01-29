@@ -1,17 +1,24 @@
-export async function onRequest(context) {
-  const request = context.request;
+export async function onRequest({ request, env }) {
+  const ip = request.headers.get("CF-Connecting-IP") ?? "unknown";
+  const ua = request.headers.get("User-Agent") ?? "unknown";
+  const country = request.headers.get("CF-IPCountry") ?? "unknown";
+  const path = new URL(request.url).pathname;
+  const time = new Date().toISOString();
 
-  const ip =
-    request.headers.get("CF-Connecting-IP") ??
-    request.headers.get("x-forwarded-for") ??
-    "unknown";
+  const key = `${time}-${crypto.randomUUID()}`;
+
+  const log = {
+    time,
+    ip,
+    ua,
+    country,
+    path
+  };
+
+  await env.ACCESS_LOGS.put(key, JSON.stringify(log));
 
   return new Response(
-    `Your IP is: ${ip}`,
-    {
-      headers: {
-        "Content-Type": "text/plain; charset=UTF-8"
-      }
-    }
+    "access logged",
+    { headers: { "Content-Type": "text/plain; charset=UTF-8" } }
   );
 }
