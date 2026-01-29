@@ -26,7 +26,7 @@ export async function onRequest({ request, env }) {
 
   // 転送（302 Temporary Redirect）
   return Response.redirect(
-    "https://google.com/",
+    "https://www.google.com/",
     302
   );
 }
